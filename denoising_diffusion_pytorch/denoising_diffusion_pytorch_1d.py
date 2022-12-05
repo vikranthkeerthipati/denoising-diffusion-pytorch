@@ -670,21 +670,24 @@ class GaussianDiffusion1D(nn.Module):
 
         model_out = self.model(x, t, x_self_cond)
 
-        if self.objective == 'pred_noise':
-            target = noise
-        elif self.objective == 'pred_x0':
-            target = x_start
-        elif self.objective == 'pred_v':
-            v = self.predict_v(x_start, t, noise)
-            target = v
-        else:
-            raise ValueError(f'unknown objective {self.objective}')
+        return model_out
 
-        loss = self.loss_fn(model_out, target, reduction = 'none')
-        loss = reduce(loss, 'b ... -> b (...)', 'mean')
+        # if self.objective == 'pred_noise':
+        #     target = noise
+        # elif self.objective == 'pred_x0':
+        #     target = x_start
+        # elif self.objective == 'pred_v':
+        #     v = self.predict_v(x_start, t, noise)
+        #     target = v
+        # else:
+        #     raise ValueError(f'unknown objective {self.objective}')
 
-        loss = loss * extract(self.p2_loss_weight, t, loss.shape)
-        return loss.mean()
+
+        # loss = self.loss_fn(model_out, target, reduction = 'none')
+        # loss = reduce(loss, 'b ... -> b (...)', 'mean')
+
+        # loss = loss * extract(self.p2_loss_weight, t, loss.shape)
+        # return loss.mean()
 
     def forward(self, img, *args, **kwargs):
         b, c, n, device, seq_length, = *img.shape, img.device, self.seq_length
